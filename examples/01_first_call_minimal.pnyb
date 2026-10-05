@@ -1,0 +1,76 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": []
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Laya Minimal First Call\n",
+        "\n",
+        "> **Attribution Notice**\n",
+        "> Adapted from the upstream [Laya repository](https://github.com/NandhaKishorM/laya) by Nandha Kishor M under the **Apache License 2.0**.\n",
+        "> \n",
+        "> *Modifications: Adjusted to install directly within a Colab notebook and load weights from the Hugging Face Hub.*"
+      ],
+      "metadata": {
+        "id": "header_attribution"
+      }
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "install_dependencies"
+      },
+      "outputs": [],
+      "source": [
+        "!pip install -q laya"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "laya_inference"
+      },
+      "outputs": [],
+      "source": [
+        "import os\n",
+        "\n",
+        "# Set these before importing laya: Colab has TensorFlow installed by default,\n",
+        "# which can deadlock model loading if not bypassed. Disable tokenizer parallel forks.\n",
+        "os.environ.setdefault(\"USE_TF\", \"0\")\n",
+        "os.environ.setdefault(\"USE_TORCH\", \"1\")\n",
+        "os.environ.setdefault(\"TOKENIZERS_PARALLELISM\", \"false\")\n",
+        "\n",
+        "import laya\n",
+        "\n",
+        "# Pulls the open-weights model directly from Hugging Face Hub into the Colab environment\n",
+        "agent = laya.load(\"convaiinnovations/laya\")\n",
+        "\n",
+        "result = agent.predict(\n",
+        "    {\"body\": \"Hi, we were billed twice for March. Please refund the duplicate today.\"},\n",
+        "    {\"refund_requested\": {\n",
+        "        \"type\": \"noul\",\n",
+        "        \"instructions\": \"Does the user explicitly request a refund?\",\n",
+        "    }},\n",
+        ")\n",
+        "\n",
+        "answer = result[\"answers\"][\"refund_requested\"]\n",
+        "print(\"P(refund requested) = %.4f  (confidence %.4f)\" % (answer[\"noul\"], answer[\"confidence\"]))\n"
+      ]
+    }
+  ]
+}
